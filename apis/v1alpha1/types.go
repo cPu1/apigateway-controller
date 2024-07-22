@@ -27,3 +27,104 @@ var (
 	_ = &aws.JSONValue{}
 	_ = ackv1alpha1.AWSAccountID("")
 )
+
+// API stage name of the associated API stage in a usage plan.
+type APIStage struct {
+	APIID *string `json:"apiID,omitempty"`
+	Stage *string `json:"stage,omitempty"`
+}
+
+// Access log settings, including the access log format and access log destination
+// ARN.
+type AccessLogSettings struct {
+	DestinationARN *string `json:"destinationARN,omitempty"`
+	Format         *string `json:"format,omitempty"`
+}
+
+// Configuration settings of a canary deployment.
+type CanarySettings struct {
+	DeploymentID           *string            `json:"deploymentID,omitempty"`
+	StageVariableOverrides map[string]*string `json:"stageVariableOverrides,omitempty"`
+}
+
+// The input configuration for a canary deployment.
+type DeploymentCanarySettings struct {
+	StageVariableOverrides map[string]*string `json:"stageVariableOverrides,omitempty"`
+}
+
+// Specifies the target API entity to which the documentation applies.
+type DocumentationPartLocation struct {
+	Method *string `json:"method,omitempty"`
+	Name   *string `json:"name,omitempty"`
+	Path   *string `json:"path,omitempty"`
+}
+
+// The endpoint configuration to indicate the types of endpoints an API (RestApi)
+// or its custom domain name (DomainName) has.
+type EndpointConfiguration struct {
+	VPCEndpointIDs []*string `json:"vpcEndpointIDs,omitempty"`
+}
+
+// Specifies the method setting properties.
+type MethodSetting struct {
+	LoggingLevel *string `json:"loggingLevel,omitempty"`
+}
+
+// Represents a summary of a Method resource, given a particular date and time.
+type MethodSnapshot struct {
+	AuthorizationType *string `json:"authorizationType,omitempty"`
+}
+
+// The mutual TLS authentication configuration for a custom domain name. If
+// specified, API Gateway performs two-way authentication between the client
+// and the server. Clients must present a trusted certificate to access your
+// API.
+type MutualTLSAuthentication struct {
+	TruststoreURI      *string   `json:"truststoreURI,omitempty"`
+	TruststoreVersion  *string   `json:"truststoreVersion,omitempty"`
+	TruststoreWarnings []*string `json:"truststoreWarnings,omitempty"`
+}
+
+// The mutual TLS authentication configuration for a custom domain name. If
+// specified, API Gateway performs two-way authentication between the client
+// and the server. Clients must present a trusted certificate to access your
+// API.
+type MutualTLSAuthenticationInput struct {
+	TruststoreURI     *string `json:"truststoreURI,omitempty"`
+	TruststoreVersion *string `json:"truststoreVersion,omitempty"`
+}
+
+// For more information about supported patch operations, see Patch Operations
+// (https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html).
+type PatchOperation struct {
+	From  *string `json:"from,omitempty"`
+	Op    *string `json:"op,omitempty"`
+	Path  *string `json:"path,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// A configuration property of an SDK type.
+type SDKConfigurationProperty struct {
+	DefaultValue *string `json:"defaultValue,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	FriendlyName *string `json:"friendlyName,omitempty"`
+	Name         *string `json:"name,omitempty"`
+}
+
+// A reference to a unique stage identified in the format {restApiId}/{stage}.
+type StageKey struct {
+	RestAPIID *string `json:"restAPIID,omitempty"`
+	StageName *string `json:"stageName,omitempty"`
+}
+
+// An API Gateway VPC link for a RestApi to access resources in an Amazon Virtual
+// Private Cloud (VPC).
+type UpdateVPCLinkOutput struct {
+	Description   *string            `json:"description,omitempty"`
+	ID            *string            `json:"id,omitempty"`
+	Name          *string            `json:"name,omitempty"`
+	Status        *string            `json:"status,omitempty"`
+	StatusMessage *string            `json:"statusMessage,omitempty"`
+	Tags          map[string]*string `json:"tags,omitempty"`
+	TargetARNs    []*string          `json:"targetARNs,omitempty"`
+}

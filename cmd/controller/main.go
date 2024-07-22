@@ -39,6 +39,8 @@ import (
 	svcresource "github.com/aws-controllers-k8s/apigateway-controller/pkg/resource"
 	svcsdk "github.com/aws/aws-sdk-go/service/apigateway"
 
+	_ "github.com/aws-controllers-k8s/apigateway-controller/pkg/resource/vpc_link"
+
 	"github.com/aws-controllers-k8s/apigateway-controller/pkg/version"
 )
 

@@ -1,17 +1,47 @@
 ignore:
   resource_names:
-      - ApiKey
-      - Authorizer
-      - BasePathMapping
-      - Deployment
-      - DocumentationPart
-      - DocumentationVersion
-      - DomainName
-      - Model
-      - RequestValidator
-      - Resource
-      - RestApi
-      - Stage
-      - UsagePlan
-      - UsagePlanKey
-      - VpcLink
+    - ApiKey
+    - Authorizer
+    - BasePathMapping
+    - Deployment
+    - DocumentationPart
+    - DocumentationVersion
+    - DomainName
+    - Model
+    - RequestValidator
+    - Resource
+    - RestApi
+    - Stage
+    - UsagePlan
+    - UsagePlanKey
+#    - VpcLink
+#
+resources:
+  VpcLink:
+    fields:
+      ID:
+        is_primary_key: true
+      TargetARNs:
+        is_immutable: true
+    hooks:
+      sdk_update_pre_build_request:
+        template_path: hooks/vpc_link/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/vpc_link/sdk_update_post_build_request.go.tpl
+    renames:
+      operations:
+        GetVpcLink:
+          input_fields:
+            VpcLinkId: Id
+        DeleteVpcLink:
+          input_fields:
+            VpcLinkId: Id
+#  RestApi:
+#    fields:
+#      id:
+#        is_primary_key: true
+#    renames:
+#      operations:
+#        GetRestApi:
+#          input_fields:
+#            RestApiId: ID
