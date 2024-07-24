@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: restapis.apigateway.services.k8s.aws
+  name: stages.apigateway.services.k8s.aws
 spec:
   group: apigateway.services.k8s.aws
   names:
-    kind: RestAPI
-    listKind: RestAPIList
-    plural: restapis
-    singular: restapi
+    kind: Stage
+    listKind: StageList
+    plural: stages
+    singular: stage
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: RestAPI is the Schema for the RestAPIS API
+        description: Stage is the Schema for the Stages API
         properties:
           apiVersion:
             description: |-
@@ -38,68 +38,51 @@ spec:
             type: object
           spec:
             description: |-
-              RestApiSpec defines the desired state of RestApi.
+              StageSpec defines the desired state of Stage.
 
 
-              Represents a REST API.
+              Represents a unique identifier for a version of a deployed RestApi that is
+              callable by users.
             properties:
-              apiKeySource:
+              cacheClusterEnabled:
+                description: Whether cache clustering is enabled for the stage.
+                type: boolean
+              cacheClusterSize:
                 description: |-
-                  The source of the API key for metering requests according to a usage plan.
-                  Valid values are: HEADER to read the API key from the X-API-Key header of
-                  a request. AUTHORIZER to read the API key from the UsageIdentifierKey from
-                  a custom authorizer.
+                  The stage's cache capacity in GB. For more information about choosing a cache
+                  size, see Enabling API caching to enhance responsiveness (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html).
                 type: string
-              binaryMediaTypes:
-                description: |-
-                  The list of binary media types supported by the RestApi. By default, the
-                  RestApi supports only UTF-8-encoded text payloads.
-                items:
-                  type: string
-                type: array
-              cloneFrom:
-                description: The ID of the RestApi that you want to clone from.
+              canarySettings:
+                description: The canary deployment settings of this stage.
+                properties:
+                  deploymentID:
+                    type: string
+                  percentTraffic:
+                    type: number
+                  stageVariableOverrides:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  useStageCache:
+                    type: boolean
+                type: object
+              deploymentID:
+                description: The identifier of the Deployment resource for the Stage
+                  resource.
                 type: string
               description:
-                description: The description of the RestApi.
+                description: The description of the Stage resource.
                 type: string
-              disableExecuteAPIEndpoint:
-                description: |-
-                  Specifies whether clients can invoke your API by using the default execute-api
-                  endpoint. By default, clients can invoke your API with the default https://{api_id}.execute-api.{region}.amazonaws.com
-                  endpoint. To require that clients use a custom domain name to invoke your
-                  API, disable the default endpoint
-                type: boolean
-              endpointConfiguration:
-                description: |-
-                  The endpoint configuration of this RestApi showing the endpoint types of
-                  the API.
-                properties:
-                  types:
-                    items:
-                      type: string
-                    type: array
-                  vpcEndpointIDs:
-                    items:
-                      type: string
-                    type: array
-                type: object
-              minimumCompressionSize:
-                description: |-
-                  A nullable integer that is used to enable compression (with non-negative
-                  between 0 and 10485760 (10M) bytes, inclusive) or disable compression (with
-                  a null value) on an API. When compression is enabled, compression or decompression
-                  is not applied on the payload if the payload size is smaller than this value.
-                  Setting it to zero allows compression for any payload size.
-                format: int64
-                type: integer
-              name:
-                description: The name of the RestApi.
+              documentationVersion:
+                description: The version of the associated API documentation.
                 type: string
-              policy:
+              restAPIID:
+                description: The string identifier of the associated RestApi.
+                type: string
+              stageName:
                 description: |-
-                  A stringified JSON policy document that applies to this RestApi regardless
-                  of the caller and Method configuration.
+                  The name for the Stage resource. Stage names can only contain alphanumeric
+                  characters, hyphens, and underscores. Maximum length is 128 characters.
                 type: string
               tags:
                 additionalProperties:
@@ -109,15 +92,34 @@ spec:
                   The tag key can be up to 128 characters and must not start with aws:. The
                   tag value can be up to 256 characters.
                 type: object
-              version:
-                description: A version identifier for the API.
-                type: string
+              tracingEnabled:
+                description: Specifies whether active tracing with X-ray is enabled
+                  for the Stage.
+                type: boolean
+              variables:
+                additionalProperties:
+                  type: string
+                description: |-
+                  A map that defines the stage variables for the new Stage resource. Variable
+                  names can have alphanumeric and underscore characters, and the values must
+                  match [A-Za-z0-9-._~:/?#&=,]+.
+                type: object
             required:
-            - name
+            - deploymentID
+            - restAPIID
+            - stageName
             type: object
           status:
-            description: RestAPIStatus defines the observed state of RestAPI
+            description: StageStatus defines the observed state of Stage
             properties:
+              accessLogSettings:
+                description: Settings for logging access in this stage.
+                properties:
+                  destinationARN:
+                    type: string
+                  format:
+                    type: string
+                type: object
               ackResourceMetadata:
                 description: |-
                   All CRs managed by ACK have a common `Status.ACKResourceMetadata` member
@@ -148,6 +150,12 @@ spec:
                 - ownerAccountID
                 - region
                 type: object
+              cacheClusterStatus:
+                description: The status of the cache cluster for the stage, if enabled.
+                type: string
+              clientCertificateID:
+                description: The identifier of a client certificate for an API stage.
+                type: string
               conditions:
                 description: |-
                   All CRS managed by ACK have a common `Status.Conditions` member that
@@ -184,24 +192,49 @@ spec:
                   type: object
                 type: array
               createdDate:
-                description: The timestamp when the API was created.
+                description: The timestamp when the stage was created.
                 format: date-time
                 type: string
-              id:
-                description: |-
-                  The API's identifier. This identifier is unique across all of your APIs in
-                  API Gateway.
+              lastUpdatedDate:
+                description: The timestamp when the stage last updated.
+                format: date-time
                 type: string
-              rootResourceID:
-                description: The API's root resource ID.
-                type: string
-              warnings:
+              methodSettings:
+                additionalProperties:
+                  description: Specifies the method setting properties.
+                  properties:
+                    cacheDataEncrypted:
+                      type: boolean
+                    cacheTTLInSeconds:
+                      format: int64
+                      type: integer
+                    cachingEnabled:
+                      type: boolean
+                    dataTraceEnabled:
+                      type: boolean
+                    loggingLevel:
+                      type: string
+                    metricsEnabled:
+                      type: boolean
+                    requireAuthorizationForCacheControl:
+                      type: boolean
+                    throttlingBurstLimit:
+                      format: int64
+                      type: integer
+                    throttlingRateLimit:
+                      type: number
+                    unauthorizedCacheControlHeaderStrategy:
+                      type: string
+                  type: object
                 description: |-
-                  The warning messages reported when failonwarnings is turned on during API
-                  import.
-                items:
-                  type: string
-                type: array
+                  A map that defines the method settings for a Stage resource. Keys (designated
+                  as /{method_setting_key below) are method paths defined as {resource_path}/{http_method}
+                  for an individual method override, or /\*/\* for overriding all methods in
+                  the stage.
+                type: object
+              webACLARN:
+                description: The ARN of the WebAcl associated with the Stage.
+                type: string
             type: object
         type: object
     served: true

@@ -9,6 +9,10 @@ rules:
 - apiGroups:
   - apigateway.services.k8s.aws
   resources:
+  - integrations
+  - resources
+  - restapis
+  - stages
   - vpclinks
   verbs:
   - create
@@ -21,6 +25,10 @@ rules:
 - apiGroups:
   - apigateway.services.k8s.aws
   resources:
+  - integrations
+  - resources
+  - restapis
+  - stages
   - vpclinks
   verbs:
   - get

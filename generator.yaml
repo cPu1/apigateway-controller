@@ -1,3 +1,15 @@
+operations:
+  PutIntegration:
+    operation_type:
+      - Create
+    resource_name: Integration
+#  DisassociateIdentityProviderConfig:
+#    operation_type:
+#      - Delete
+#    resource_name:
+#      IdentityProviderConfig
+#  DescribeIdentityProviderConfig:
+#    custom_check_required_fields_missing_method: customCheckRequiredFieldsMissing
 ignore:
   resource_names:
     - ApiKey
@@ -9,9 +21,9 @@ ignore:
     - DomainName
     - Model
     - RequestValidator
-    - Resource
-    - RestApi
-    - Stage
+#    - Resource
+#    - RestApi
+#    - Stage
     - UsagePlan
     - UsagePlanKey
 #    - VpcLink
@@ -33,15 +45,60 @@ resources:
         GetVpcLink:
           input_fields:
             VpcLinkId: Id
+        UpdateVpcLink:
+          input_fields:
+            VpcLinkId: Id
         DeleteVpcLink:
           input_fields:
             VpcLinkId: Id
-#  RestApi:
-#    fields:
-#      id:
+  RestApi:
+    fields:
+      ID:
+        is_primary_key: true
+    renames:
+      operations:
+        GetRestApi:
+          input_fields:
+            RestApiId: Id
+        UpdateRestApi:
+          input_fields:
+            RestApiId: Id
+        DeleteRestApi:
+          input_fields:
+            RestApiId: Id
+    hooks:
+      sdk_update_post_build_request:
+        template_path: hooks/rest_api/sdk_update_post_build_request.go.tpl
+  Resource:
+    tags:
+      ignore: true
+    fields:
+      ID:
+        is_primary_key: true
+    renames:
+      operations:
+        GetResource:
+          input_fields:
+            ResourceId: Id
+        UpdateResource:
+          input_fields:
+            ResourceId: Id
+        DeleteResource:
+          input_fields:
+            ResourceId: Id
+
+  Integration:
+    fields:
+#      HttpMethod:
 #        is_primary_key: true
-#    renames:
-#      operations:
-#        GetRestApi:
-#          input_fields:
-#            RestApiId: ID
+      ResourceID:
+        is_primary_key: true
+#      RestAPIID:
+#        is_primary_key: true
+      Type:
+        is_immutable: true
+    tags:
+      ignore: true
+    hooks:
+      sdk_update_post_build_request:
+        template_path: hooks/integration/sdk_update_post_build_request.go.tpl

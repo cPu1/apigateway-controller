@@ -75,6 +75,10 @@ spec:
                   The endpoint configuration of this RestApi showing the endpoint types of
                   the API.
                 properties:
+                  types:
+                    items:
+                      type: string
+                    type: array
                   vpcEndpointIDs:
                     items:
                       type: string
