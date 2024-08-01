@@ -42,6 +42,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(a, b)
 
 	if ackcompare.HasNilDifference(a.ko.Spec.APIKeySource, b.ko.Spec.APIKeySource) {
 		delta.Add("Spec.APIKeySource", a.ko.Spec.APIKeySource, b.ko.Spec.APIKeySource)

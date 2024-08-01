@@ -46,16 +46,48 @@ spec:
               parentID:
                 description: The parent resource's identifier.
                 type: string
+              parentRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
               pathPart:
                 description: The last path segment for this resource.
                 type: string
               restAPIID:
                 description: The string identifier of the associated RestApi.
                 type: string
+              restAPIRef:
+                description: "AWSResourceReferenceWrapper provides a wrapper around
+                  *AWSResourceReference\ntype to provide more user friendly syntax
+                  for references using 'from' field\nEx:\nAPIIDRef:\n\n\n\tfrom:\n\t
+                  \ name: my-api"
+                properties:
+                  from:
+                    description: |-
+                      AWSResourceReference provides all the values necessary to reference another
+                      k8s resource for finding the identifier(Id/ARN/Name)
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
             required:
-            - parentID
             - pathPart
-            - restAPIID
             type: object
           status:
             description: ResourceStatus defines the observed state of Resource
@@ -131,141 +163,6 @@ spec:
               path:
                 description: The full path for this resource.
                 type: string
-              resourceMethods:
-                additionalProperties:
-                  description: |-
-                    Represents a client-facing interface by which the client calls the API to
-                    access back-end resources. A Method resource is integrated with an Integration
-                    resource. Both consist of a request and one or more responses. The method
-                    request takes the client input that is passed to the back end through the
-                    integration request. A method response returns the output from the back end
-                    to the client through an integration response. A method request is embodied
-                    in a Method resource, whereas an integration request is embodied in an Integration
-                    resource. On the other hand, a method response is represented by a MethodResponse
-                    resource, whereas an integration response is represented by an IntegrationResponse
-                    resource.
-                  properties:
-                    apiKeyRequired:
-                      type: boolean
-                    authorizationScopes:
-                      items:
-                        type: string
-                      type: array
-                    authorizationType:
-                      type: string
-                    authorizerID:
-                      type: string
-                    httpMethod:
-                      type: string
-                    methodIntegration:
-                      description: Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY,
-                        or Mock integration.
-                      properties:
-                        cacheKeyParameters:
-                          items:
-                            type: string
-                          type: array
-                        cacheNamespace:
-                          type: string
-                        connectionID:
-                          type: string
-                        connectionType:
-                          type: string
-                        contentHandling:
-                          type: string
-                        credentials:
-                          type: string
-                        httpMethod:
-                          type: string
-                        integrationResponses:
-                          additionalProperties:
-                            description: |-
-                              Represents an integration response. The status code must map to an existing
-                              MethodResponse, and parameters and templates can be used to transform the
-                              back-end response.
-                            properties:
-                              contentHandling:
-                                type: string
-                              responseParameters:
-                                additionalProperties:
-                                  type: string
-                                type: object
-                              responseTemplates:
-                                additionalProperties:
-                                  type: string
-                                type: object
-                              selectionPattern:
-                                type: string
-                              statusCode:
-                                description: The status code.
-                                type: string
-                            type: object
-                          type: object
-                        passthroughBehavior:
-                          type: string
-                        requestParameters:
-                          additionalProperties:
-                            type: string
-                          type: object
-                        requestTemplates:
-                          additionalProperties:
-                            type: string
-                          type: object
-                        timeoutInMillis:
-                          format: int64
-                          type: integer
-                        tlsConfig:
-                          description: Specifies the TLS configuration for an integration.
-                          properties:
-                            insecureSkipVerification:
-                              type: boolean
-                          type: object
-                        type_:
-                          description: |-
-                            The integration type. The valid value is HTTP for integrating an API method
-                            with an HTTP backend; AWS with any Amazon Web Services service endpoints;
-                            MOCK for testing without actually invoking the backend; HTTP_PROXY for integrating
-                            with the HTTP proxy integration; AWS_PROXY for integrating with the Lambda
-                            proxy integration.
-                          type: string
-                        uri:
-                          type: string
-                      type: object
-                    methodResponses:
-                      additionalProperties:
-                        description: |-
-                          Represents a method response of a given HTTP status code returned to the
-                          client. The method response is passed from the back end through the associated
-                          integration response that can be transformed using a mapping template.
-                        properties:
-                          responseModels:
-                            additionalProperties:
-                              type: string
-                            type: object
-                          responseParameters:
-                            additionalProperties:
-                              type: boolean
-                            type: object
-                          statusCode:
-                            description: The status code.
-                            type: string
-                        type: object
-                      type: object
-                    operationName:
-                      type: string
-                    requestModels:
-                      additionalProperties:
-                        type: string
-                      type: object
-                    requestParameters:
-                      additionalProperties:
-                        type: boolean
-                      type: object
-                    requestValidatorID:
-                      type: string
-                  type: object
-                description: Gets an API resource's method of a given HTTP verb.
-                type: object
             type: object
         type: object
     served: true

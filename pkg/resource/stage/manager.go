@@ -268,6 +268,14 @@ func (rm *resourceManager) IsSynced(ctx context.Context, res acktypes.AWSResourc
 		panic("resource manager's IsSynced() method received resource with nil CR object")
 	}
 
+	if r.ko.Status.CacheClusterStatus == nil {
+		return false, nil
+	}
+	cacheClusterStatusCandidates := []string{"AVAILABLE", "NOT_AVAILABLE"}
+	if !ackutil.InStrings(*r.ko.Status.CacheClusterStatus, cacheClusterStatusCandidates) {
+		return false, nil
+	}
+
 	return true, nil
 }
 

@@ -131,6 +131,20 @@ rules:
   - patch
   - update
 - apiGroups:
+  - ec2.services.k8s.aws
+  resources:
+  - vpcendpoints
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ec2.services.k8s.aws
+  resources:
+  - vpcendpoints/status
+  verbs:
+  - get
+  - list
+- apiGroups:
   - services.k8s.aws
   resources:
   - adoptedresources

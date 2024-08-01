@@ -560,10 +560,24 @@ func (rm *resourceManager) sdkUpdate(
 	defer func() {
 		exit(err)
 	}()
+	if delta.DifferentAt("Spec.Tags") {
+		resourceARN, err := arnForResource(desired.ko)
+		if err != nil {
+			return nil, fmt.Errorf("applying tags: %w", err)
+		}
+		if err := syncTags(ctx, rm.sdkapi, rm.metrics, resourceARN, desired.ko.Spec.Tags, latest.ko.Spec.Tags); err != nil {
+			return nil, err
+		}
+	}
+	if !delta.DifferentExcept("Spec.Tags") {
+		return desired, nil
+	}
+
 	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
 	if err != nil {
 		return nil, err
 	}
+	updateStageInput(desired, latest, input, delta)
 
 	var resp *svcsdk.Stage
 	_ = resp
@@ -895,6 +909,20 @@ func (rm *resourceManager) updateConditions(
 // and if the exception indicates that it is a Terminal exception
 // 'Terminal' exception are specified in generator configuration
 func (rm *resourceManager) terminalAWSError(err error) bool {
-	// No terminal_errors specified for this resource in generator config
-	return false
+	if err == nil {
+		return false
+	}
+	awsErr, ok := ackerr.AWSError(err)
+	if !ok {
+		return false
+	}
+	switch awsErr.Code() {
+	case "BadRequestException",
+		"ConflictException",
+		"NotFoundException",
+		"InvalidParameter":
+		return true
+	default:
+		return false
+	}
 }

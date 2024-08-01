@@ -42,6 +42,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(a, b)
 
 	if ackcompare.HasNilDifference(a.ko.Spec.CacheClusterEnabled, b.ko.Spec.CacheClusterEnabled) {
 		delta.Add("Spec.CacheClusterEnabled", a.ko.Spec.CacheClusterEnabled, b.ko.Spec.CacheClusterEnabled)
@@ -116,6 +117,9 @@ func newResourceDelta(
 		if *a.ko.Spec.RestAPIID != *b.ko.Spec.RestAPIID {
 			delta.Add("Spec.RestAPIID", a.ko.Spec.RestAPIID, b.ko.Spec.RestAPIID)
 		}
+	}
+	if !reflect.DeepEqual(a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef) {
+		delta.Add("Spec.RestAPIRef", a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.StageName, b.ko.Spec.StageName) {
 		delta.Add("Spec.StageName", a.ko.Spec.StageName, b.ko.Spec.StageName)

@@ -36,7 +36,8 @@ type IntegrationSpec struct {
 	CacheNamespace *string `json:"cacheNamespace,omitempty"`
 	// The ID of the VpcLink used for the integration. Specify this value only if
 	// you specify VPC_LINK as the connection type.
-	ConnectionID *string `json:"connectionID,omitempty"`
+	ConnectionID  *string                                  `json:"connectionID,omitempty"`
+	ConnectionRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"connectionRef,omitempty"`
 	// The type of the network connection to the integration endpoint. The valid
 	// value is INTERNET for connections through the public routable internet or
 	// VPC_LINK for private connections between API Gateway and a network load balancer
@@ -75,11 +76,11 @@ type IntegrationSpec struct {
 	// value.
 	RequestTemplates map[string]*string `json:"requestTemplates,omitempty"`
 	// Specifies a put integration request's resource ID.
-	// +kubebuilder:validation:Required
-	ResourceID *string `json:"resourceID"`
+	ResourceID  *string                                  `json:"resourceID,omitempty"`
+	ResourceRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"resourceRef,omitempty"`
 	// The string identifier of the associated RestApi.
-	// +kubebuilder:validation:Required
-	RestAPIID *string `json:"restAPIID"`
+	RestAPIID  *string                                  `json:"restAPIID,omitempty"`
+	RestAPIRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"restAPIRef,omitempty"`
 	// Custom timeout between 50 and 29,000 milliseconds. The default value is 29,000
 	// milliseconds or 29 seconds.
 	TimeoutInMillis *int64     `json:"timeoutInMillis,omitempty"`

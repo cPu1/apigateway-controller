@@ -42,6 +42,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(a, b)
 
 	if len(a.ko.Spec.CacheKeyParameters) != len(b.ko.Spec.CacheKeyParameters) {
 		delta.Add("Spec.CacheKeyParameters", a.ko.Spec.CacheKeyParameters, b.ko.Spec.CacheKeyParameters)
@@ -63,6 +64,9 @@ func newResourceDelta(
 		if *a.ko.Spec.ConnectionID != *b.ko.Spec.ConnectionID {
 			delta.Add("Spec.ConnectionID", a.ko.Spec.ConnectionID, b.ko.Spec.ConnectionID)
 		}
+	}
+	if !reflect.DeepEqual(a.ko.Spec.ConnectionRef, b.ko.Spec.ConnectionRef) {
+		delta.Add("Spec.ConnectionRef", a.ko.Spec.ConnectionRef, b.ko.Spec.ConnectionRef)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.ConnectionType, b.ko.Spec.ConnectionType) {
 		delta.Add("Spec.ConnectionType", a.ko.Spec.ConnectionType, b.ko.Spec.ConnectionType)
@@ -127,12 +131,18 @@ func newResourceDelta(
 			delta.Add("Spec.ResourceID", a.ko.Spec.ResourceID, b.ko.Spec.ResourceID)
 		}
 	}
+	if !reflect.DeepEqual(a.ko.Spec.ResourceRef, b.ko.Spec.ResourceRef) {
+		delta.Add("Spec.ResourceRef", a.ko.Spec.ResourceRef, b.ko.Spec.ResourceRef)
+	}
 	if ackcompare.HasNilDifference(a.ko.Spec.RestAPIID, b.ko.Spec.RestAPIID) {
 		delta.Add("Spec.RestAPIID", a.ko.Spec.RestAPIID, b.ko.Spec.RestAPIID)
 	} else if a.ko.Spec.RestAPIID != nil && b.ko.Spec.RestAPIID != nil {
 		if *a.ko.Spec.RestAPIID != *b.ko.Spec.RestAPIID {
 			delta.Add("Spec.RestAPIID", a.ko.Spec.RestAPIID, b.ko.Spec.RestAPIID)
 		}
+	}
+	if !reflect.DeepEqual(a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef) {
+		delta.Add("Spec.RestAPIRef", a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.TimeoutInMillis, b.ko.Spec.TimeoutInMillis) {
 		delta.Add("Spec.TimeoutInMillis", a.ko.Spec.TimeoutInMillis, b.ko.Spec.TimeoutInMillis)

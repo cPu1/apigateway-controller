@@ -50,6 +50,9 @@ func newResourceDelta(
 			delta.Add("Spec.ParentID", a.ko.Spec.ParentID, b.ko.Spec.ParentID)
 		}
 	}
+	if !reflect.DeepEqual(a.ko.Spec.ParentRef, b.ko.Spec.ParentRef) {
+		delta.Add("Spec.ParentRef", a.ko.Spec.ParentRef, b.ko.Spec.ParentRef)
+	}
 	if ackcompare.HasNilDifference(a.ko.Spec.PathPart, b.ko.Spec.PathPart) {
 		delta.Add("Spec.PathPart", a.ko.Spec.PathPart, b.ko.Spec.PathPart)
 	} else if a.ko.Spec.PathPart != nil && b.ko.Spec.PathPart != nil {
@@ -63,6 +66,9 @@ func newResourceDelta(
 		if *a.ko.Spec.RestAPIID != *b.ko.Spec.RestAPIID {
 			delta.Add("Spec.RestAPIID", a.ko.Spec.RestAPIID, b.ko.Spec.RestAPIID)
 		}
+	}
+	if !reflect.DeepEqual(a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef) {
+		delta.Add("Spec.RestAPIRef", a.ko.Spec.RestAPIRef, b.ko.Spec.RestAPIRef)
 	}
 
 	return delta

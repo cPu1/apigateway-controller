@@ -26,14 +26,14 @@ import (
 type ResourceSpec struct {
 
 	// The parent resource's identifier.
-	// +kubebuilder:validation:Required
-	ParentID *string `json:"parentID"`
+	ParentID  *string                                  `json:"parentID,omitempty"`
+	ParentRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"parentRef,omitempty"`
 	// The last path segment for this resource.
 	// +kubebuilder:validation:Required
 	PathPart *string `json:"pathPart"`
 	// The string identifier of the associated RestApi.
-	// +kubebuilder:validation:Required
-	RestAPIID *string `json:"restAPIID"`
+	RestAPIID  *string                                  `json:"restAPIID,omitempty"`
+	RestAPIRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"restAPIRef,omitempty"`
 }
 
 // ResourceStatus defines the observed state of Resource
@@ -55,9 +55,6 @@ type ResourceStatus struct {
 	// The full path for this resource.
 	// +kubebuilder:validation:Optional
 	Path *string `json:"path,omitempty"`
-	// Gets an API resource's method of a given HTTP verb.
-	// +kubebuilder:validation:Optional
-	ResourceMethods map[string]*Method `json:"resourceMethods,omitempty"`
 }
 
 // Resource is the Schema for the Resources API

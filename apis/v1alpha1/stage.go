@@ -41,8 +41,8 @@ type StageSpec struct {
 	// The version of the associated API documentation.
 	DocumentationVersion *string `json:"documentationVersion,omitempty"`
 	// The string identifier of the associated RestApi.
-	// +kubebuilder:validation:Required
-	RestAPIID *string `json:"restAPIID"`
+	RestAPIID  *string                                  `json:"restAPIID,omitempty"`
+	RestAPIRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"restAPIRef,omitempty"`
 	// The name for the Stage resource. Stage names can only contain alphanumeric
 	// characters, hyphens, and underscores. Maximum length is 128 characters.
 	// +kubebuilder:validation:Required

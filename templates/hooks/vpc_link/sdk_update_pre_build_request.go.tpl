@@ -1,11 +1,12 @@
 	if delta.DifferentAt("Spec.Tags") {
-		if err := syncTags(
-			ctx, rm.sdkapi, rm.metrics,
-			makeARN(*desired.ko.Status.ID),
-			desired.ko.Spec.Tags, latest.ko.Spec.Tags,
-		); err != nil {
+	    resourceARN, err := arnForResource(desired.ko)
+        if err != nil {
+            return nil, fmt.Errorf("applying tags: %w", err)
+        }
+		if err := syncTags(ctx, rm.sdkapi, rm.metrics, resourceARN, desired.ko.Spec.Tags, latest.ko.Spec.Tags); err != nil {
 			return nil, err
 		}
-	} else if !delta.DifferentExcept("Spec.Tags") {
+	}
+	if !delta.DifferentExcept("Spec.Tags") {
         return desired, nil
     }

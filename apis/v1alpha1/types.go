@@ -68,6 +68,8 @@ type DocumentationPartLocation struct {
 type EndpointConfiguration struct {
 	Types          []*string `json:"types,omitempty"`
 	VPCEndpointIDs []*string `json:"vpcEndpointIDs,omitempty"`
+	// Reference field for VPCEndpointIDs
+	VPCEndpointRefs []*ackv1alpha1.AWSResourceReferenceWrapper `json:"vpcEndpointRefs,omitempty"`
 }
 
 // Represents an integration response. The status code must map to an existing
@@ -78,66 +80,6 @@ type IntegrationResponse struct {
 	ResponseParameters map[string]*string `json:"responseParameters,omitempty"`
 	ResponseTemplates  map[string]*string `json:"responseTemplates,omitempty"`
 	SelectionPattern   *string            `json:"selectionPattern,omitempty"`
-	// The status code.
-	StatusCode *string `json:"statusCode,omitempty"`
-}
-
-// Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY, or Mock integration.
-type Integration_SDK struct {
-	CacheKeyParameters   []*string                       `json:"cacheKeyParameters,omitempty"`
-	CacheNamespace       *string                         `json:"cacheNamespace,omitempty"`
-	ConnectionID         *string                         `json:"connectionID,omitempty"`
-	ConnectionType       *string                         `json:"connectionType,omitempty"`
-	ContentHandling      *string                         `json:"contentHandling,omitempty"`
-	Credentials          *string                         `json:"credentials,omitempty"`
-	HTTPMethod           *string                         `json:"httpMethod,omitempty"`
-	IntegrationResponses map[string]*IntegrationResponse `json:"integrationResponses,omitempty"`
-	PassthroughBehavior  *string                         `json:"passthroughBehavior,omitempty"`
-	RequestParameters    map[string]*string              `json:"requestParameters,omitempty"`
-	RequestTemplates     map[string]*string              `json:"requestTemplates,omitempty"`
-	TimeoutInMillis      *int64                          `json:"timeoutInMillis,omitempty"`
-	// Specifies the TLS configuration for an integration.
-	TLSConfig *TLSConfig `json:"tlsConfig,omitempty"`
-	// The integration type. The valid value is HTTP for integrating an API method
-	// with an HTTP backend; AWS with any Amazon Web Services service endpoints;
-	// MOCK for testing without actually invoking the backend; HTTP_PROXY for integrating
-	// with the HTTP proxy integration; AWS_PROXY for integrating with the Lambda
-	// proxy integration.
-	Type *string `json:"type_,omitempty"`
-	URI  *string `json:"uri,omitempty"`
-}
-
-// Represents a client-facing interface by which the client calls the API to
-// access back-end resources. A Method resource is integrated with an Integration
-// resource. Both consist of a request and one or more responses. The method
-// request takes the client input that is passed to the back end through the
-// integration request. A method response returns the output from the back end
-// to the client through an integration response. A method request is embodied
-// in a Method resource, whereas an integration request is embodied in an Integration
-// resource. On the other hand, a method response is represented by a MethodResponse
-// resource, whereas an integration response is represented by an IntegrationResponse
-// resource.
-type Method struct {
-	APIKeyRequired      *bool     `json:"apiKeyRequired,omitempty"`
-	AuthorizationScopes []*string `json:"authorizationScopes,omitempty"`
-	AuthorizationType   *string   `json:"authorizationType,omitempty"`
-	AuthorizerID        *string   `json:"authorizerID,omitempty"`
-	HTTPMethod          *string   `json:"httpMethod,omitempty"`
-	// Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY, or Mock integration.
-	MethodIntegration  *Integration_SDK           `json:"methodIntegration,omitempty"`
-	MethodResponses    map[string]*MethodResponse `json:"methodResponses,omitempty"`
-	OperationName      *string                    `json:"operationName,omitempty"`
-	RequestModels      map[string]*string         `json:"requestModels,omitempty"`
-	RequestParameters  map[string]*bool           `json:"requestParameters,omitempty"`
-	RequestValidatorID *string                    `json:"requestValidatorID,omitempty"`
-}
-
-// Represents a method response of a given HTTP status code returned to the
-// client. The method response is passed from the back end through the associated
-// integration response that can be transformed using a mapping template.
-type MethodResponse struct {
-	ResponseModels     map[string]*string `json:"responseModels,omitempty"`
-	ResponseParameters map[string]*bool   `json:"responseParameters,omitempty"`
 	// The status code.
 	StatusCode *string `json:"statusCode,omitempty"`
 }
@@ -198,11 +140,10 @@ type QuotaSettings struct {
 
 // Represents an API resource.
 type Resource_SDK struct {
-	ID              *string            `json:"id,omitempty"`
-	ParentID        *string            `json:"parentID,omitempty"`
-	Path            *string            `json:"path,omitempty"`
-	PathPart        *string            `json:"pathPart,omitempty"`
-	ResourceMethods map[string]*Method `json:"resourceMethods,omitempty"`
+	ID       *string `json:"id,omitempty"`
+	ParentID *string `json:"parentID,omitempty"`
+	Path     *string `json:"path,omitempty"`
+	PathPart *string `json:"pathPart,omitempty"`
 }
 
 // Represents a REST API.

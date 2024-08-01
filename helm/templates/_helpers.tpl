@@ -178,6 +178,20 @@ rules:
   - patch
   - update
 - apiGroups:
+  - ec2.services.k8s.aws
+  resources:
+  - vpcendpoints
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ec2.services.k8s.aws
+  resources:
+  - vpcendpoints/status
+  verbs:
+  - get
+  - list
+- apiGroups:
   - services.k8s.aws
   resources:
   - adoptedresources
@@ -218,3 +232,12 @@ rules:
   - patch
   - update
 {{- end }}
+
+{{/* Convert k/v map to string like: "key1=value1,key2=value2,..." */}}
+{{- define "ack-apigateway-controller.feature-gates" -}}
+{{- $list := list -}}
+{{- range $k, $v := .Values.featureGates -}}
+{{- $list = append $list (printf "%s=%s" $k ( $v | toString)) -}}
+{{- end -}}
+{{ join "," $list }}
+{{- end -}}

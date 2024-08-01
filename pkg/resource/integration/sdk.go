@@ -522,9 +522,7 @@ func (rm *resourceManager) sdkUpdate(
 	if err != nil {
 		return nil, err
 	}
-	if err := updateIntegrationInput(desired, latest, input, delta); err != nil {
-		return nil, err
-	}
+	updateIntegrationInput(desired, latest, input, delta)
 
 	var resp *svcsdk.Integration
 	_ = resp
@@ -833,8 +831,22 @@ func (rm *resourceManager) updateConditions(
 // and if the exception indicates that it is a Terminal exception
 // 'Terminal' exception are specified in generator configuration
 func (rm *resourceManager) terminalAWSError(err error) bool {
-	// No terminal_errors specified for this resource in generator config
-	return false
+	if err == nil {
+		return false
+	}
+	awsErr, ok := ackerr.AWSError(err)
+	if !ok {
+		return false
+	}
+	switch awsErr.Code() {
+	case "BadRequestException",
+		"ConflictException",
+		"NotFoundException",
+		"InvalidParameter":
+		return true
+	default:
+		return false
+	}
 }
 
 // getImmutableFieldChanges returns list of immutable fields from the

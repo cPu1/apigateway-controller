@@ -300,14 +300,15 @@ func (rm *resourceManager) sdkUpdate(
 		return nil, ackerr.NewTerminalError(fmt.Errorf(msg))
 	}
 	if delta.DifferentAt("Spec.Tags") {
-		if err := syncTags(
-			ctx, rm.sdkapi, rm.metrics,
-			makeARN(*desired.ko.Status.ID),
-			desired.ko.Spec.Tags, latest.ko.Spec.Tags,
-		); err != nil {
+		resourceARN, err := arnForResource(desired.ko)
+		if err != nil {
+			return nil, fmt.Errorf("applying tags: %w", err)
+		}
+		if err := syncTags(ctx, rm.sdkapi, rm.metrics, resourceARN, desired.ko.Spec.Tags, latest.ko.Spec.Tags); err != nil {
 			return nil, err
 		}
-	} else if !delta.DifferentExcept("Spec.Tags") {
+	}
+	if !delta.DifferentExcept("Spec.Tags") {
 		return desired, nil
 	}
 
@@ -315,9 +316,20 @@ func (rm *resourceManager) sdkUpdate(
 	if err != nil {
 		return nil, err
 	}
-	if err := updateVPCLinkInput(desired, input, delta); err != nil {
-		return nil, err
+	if delta.DifferentAt("Spec.Tags") {
+		resourceARN, err := arnForResource(desired.ko)
+		if err != nil {
+			return nil, fmt.Errorf("applying tags: %w", err)
+		}
+		if err := syncTags(ctx, rm.sdkapi, rm.metrics, resourceARN, desired.ko.Spec.Tags, latest.ko.Spec.Tags); err != nil {
+			return nil, err
+		}
 	}
+	if !delta.DifferentExcept("Spec.Tags") {
+		return desired, nil
+	}
+
+	updateVPCLinkInput(desired, input, delta)
 
 	var resp *svcsdk.UpdateVpcLinkOutput
 	_ = resp
@@ -408,6 +420,10 @@ func (rm *resourceManager) sdkDelete(
 	defer func() {
 		exit(err)
 	}()
+	if err := validateDeleteState(r); err != nil {
+		return r, err
+	}
+
 	input, err := rm.newDeleteRequestPayload(r)
 	if err != nil {
 		return nil, err
