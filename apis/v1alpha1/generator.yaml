@@ -64,6 +64,10 @@ resources:
           resource: VPCEndpoint
           service_name: ec2
           path: Status.VPCEndpointID
+      CloneFrom:
+        is_immutable: true
+      Version:
+        is_immutable: true
     renames:
       operations:
         GetRestApi:
@@ -102,9 +106,14 @@ resources:
         references:
           resource: RestAPI
           path: Status.ID
+        is_immutable: true
     hooks:
       sdk_update_post_build_request:
         template_path: hooks/resource/sdk_update_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/resource/sdk_create_post_set_output.go.tpl
+      sdk_read_one_pre_build_request:
+        template_path: hooks/resource/sdk_read_one_pre_build_request.go.tpl
     renames:
       operations:
         GetResource:
@@ -129,13 +138,16 @@ resources:
         references:
           resource: Resource
           path: Status.ID
+        is_immutable: true
       RestAPIID:
         references:
           resource: RestAPI
           path: Status.ID
         is_required: true
-      HttpMethod:
+        is_immutable: true
+      HTTPMethod:
         is_required: true
+        is_immutable: true
       Type:
         is_immutable: true
       ConnectionID:
@@ -147,6 +159,10 @@ resources:
     hooks:
       sdk_update_post_build_request:
         template_path: hooks/integration/sdk_update_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/integration/sdk_create_post_set_output.go.tpl
+      sdk_read_one_pre_build_request:
+        template_path: hooks/integration/sdk_read_one_pre_build_request.go.tpl
       delta_pre_compare:
         code: customPreCompare(a, b)
     exceptions:
@@ -164,6 +180,10 @@ resources:
           resource: RestAPI
           path: Status.ID
         is_required: true
+        is_immutable: true
+      StageName:
+        is_required: true
+        is_immutable: true
     synced:
       when:
         - path: Status.CacheClusterStatus
@@ -175,6 +195,10 @@ resources:
         template_path: hooks/stage/sdk_update_pre_build_request.go.tpl
       sdk_update_post_build_request:
         template_path: hooks/stage/sdk_update_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/stage/sdk_create_post_set_output.go.tpl
+      sdk_read_one_pre_build_request:
+        template_path: hooks/stage/sdk_read_one_pre_build_request.go.tpl
       delta_pre_compare:
         code: customPreCompare(a, b)
     exceptions:

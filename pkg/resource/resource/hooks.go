@@ -15,12 +15,14 @@ package resource
 
 import (
 	"github.com/aws-controllers-k8s/runtime/pkg/compare"
-	"github.com/aws/aws-sdk-go/service/apigateway"
+	svcsdk "github.com/aws/aws-sdk-go/service/apigateway"
 
+	svcapitypes "github.com/aws-controllers-k8s/apigateway-controller/apis/v1alpha1"
+	"github.com/aws-controllers-k8s/apigateway-controller/pkg/util"
 	"github.com/aws-controllers-k8s/apigateway-controller/pkg/util/patch"
 )
 
-func updateResourceInput(desired *resource, input *apigateway.UpdateResourceInput, delta *compare.Delta) {
+func updateResourceInput(desired *resource, input *svcsdk.UpdateResourceInput, delta *compare.Delta) {
 	desiredSpec := desired.ko.Spec
 	var patchSet patch.Set
 	if delta.DifferentAt("Spec.ParentID") {
@@ -30,4 +32,26 @@ func updateResourceInput(desired *resource, input *apigateway.UpdateResourceInpu
 		patchSet.Replace("/pathPart", desiredSpec.PathPart)
 	}
 	input.PatchOperations = patchSet.GetPatchOperations()
+}
+
+type resourceID struct {
+	RestAPIID *string `json:"restAPIID"`
+}
+
+func setResourceIDAnnotation(ko *svcapitypes.Resource) error {
+	return util.SetResourceIDAnnotation(ko, resourceID{
+		RestAPIID: ko.Spec.RestAPIID,
+	})
+}
+
+func updateResource(r *resource) (*resource, error) {
+	if err := util.UpdateResourceFromAnnotation(r.ko, func(id resourceID, ko *svcapitypes.Resource) {
+		r = &resource{ko: ko}
+		if ko.Spec.RestAPIID != nil {
+			ko.Spec.RestAPIID = id.RestAPIID
+		}
+	}); err != nil {
+		return nil, err
+	}
+	return r, nil
 }

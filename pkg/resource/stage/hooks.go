@@ -19,7 +19,7 @@ import (
 
 	"github.com/aws-controllers-k8s/runtime/pkg/compare"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/apigateway"
+	svcsdk "github.com/aws/aws-sdk-go/service/apigateway"
 
 	svcapitypes "github.com/aws-controllers-k8s/apigateway-controller/apis/v1alpha1"
 	"github.com/aws-controllers-k8s/apigateway-controller/pkg/tags"
@@ -34,7 +34,7 @@ func arnForResource(desired *svcapitypes.Stage) (string, error) {
 		fmt.Sprintf("/restapis/%s/stages/%s", *desired.Spec.RestAPIID, *desired.Spec.StageName))
 }
 
-func updateStageInput(desired, latest *resource, input *apigateway.UpdateStageInput, delta *compare.Delta) {
+func updateStageInput(desired, latest *resource, input *svcsdk.UpdateStageInput, delta *compare.Delta) {
 	latestSpec := latest.ko.Spec
 	desiredSpec := desired.ko.Spec
 
@@ -137,4 +137,32 @@ func customPreCompare(a, b *resource) {
 	} else if a.ko.Spec.CanarySettings.StageVariableOverrides != nil && b.ko.Spec.CanarySettings.StageVariableOverrides == nil {
 		b.ko.Spec.CanarySettings.StageVariableOverrides = map[string]*string{}
 	}
+}
+
+type stageID struct {
+	RestAPIID *string `json:"restAPIID"`
+	StageName *string `json:"stageName"`
+}
+
+// TODO: spec only.
+func setResourceIDAnnotation(ko *svcapitypes.Stage) error {
+	return util.SetResourceIDAnnotation(ko, stageID{
+		RestAPIID: ko.Spec.RestAPIID,
+		StageName: ko.Spec.StageName,
+	})
+}
+
+func updateResource(r *resource) (*resource, error) {
+	if err := util.UpdateResourceFromAnnotation(r.ko, func(id stageID, ko *svcapitypes.Stage) {
+		r = &resource{ko: ko}
+		if ko.Spec.RestAPIID != nil {
+			ko.Spec.RestAPIID = id.RestAPIID
+		}
+		if ko.Spec.StageName != nil {
+			ko.Spec.StageName = id.StageName
+		}
+	}); err != nil {
+		return nil, err
+	}
+	return r, nil
 }

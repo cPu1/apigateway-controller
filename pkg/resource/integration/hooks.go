@@ -18,13 +18,14 @@ import (
 
 	"github.com/aws-controllers-k8s/runtime/pkg/compare"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/apigateway"
+	svcsdk "github.com/aws/aws-sdk-go/service/apigateway"
 
 	svcapitypes "github.com/aws-controllers-k8s/apigateway-controller/apis/v1alpha1"
+	"github.com/aws-controllers-k8s/apigateway-controller/pkg/util"
 	"github.com/aws-controllers-k8s/apigateway-controller/pkg/util/patch"
 )
 
-func updateIntegrationInput(desired, latest *resource, input *apigateway.UpdateIntegrationInput, delta *compare.Delta) {
+func updateIntegrationInput(desired, latest *resource, input *svcsdk.UpdateIntegrationInput, delta *compare.Delta) {
 	latestSpec := latest.ko.Spec
 	desiredSpec := desired.ko.Spec
 
@@ -93,4 +94,36 @@ func customPreCompare(a, b *resource) {
 	} else if a.ko.Spec.TLSConfig != nil && b.ko.Spec.TLSConfig == nil {
 		b.ko.Spec.TLSConfig = &svcapitypes.TLSConfig{}
 	}
+}
+
+type integrationID struct {
+	RestAPIID  *string `json:"restAPIID,omitempty"`
+	HTTPMethod *string `json:"httpMethod"`
+	ResourceID *string `json:"resourceID,omitempty"`
+}
+
+func setResourceIDAnnotation(ko *svcapitypes.Integration) error {
+	return util.SetResourceIDAnnotation(ko, integrationID{
+		RestAPIID:  ko.Spec.RestAPIID,
+		HTTPMethod: ko.Spec.HTTPMethod,
+		ResourceID: ko.Spec.ResourceID,
+	})
+}
+
+func updateResource(r *resource) (*resource, error) {
+	if err := util.UpdateResourceFromAnnotation(r.ko, func(id integrationID, ko *svcapitypes.Integration) {
+		r = &resource{ko: ko}
+		if ko.Spec.RestAPIID != nil {
+			ko.Spec.RestAPIID = id.RestAPIID
+		}
+		if ko.Spec.HTTPMethod != nil {
+			ko.Spec.HTTPMethod = id.HTTPMethod
+		}
+		if ko.Spec.ResourceID != nil {
+			ko.Spec.ResourceID = id.ResourceID
+		}
+	}); err != nil {
+		return nil, err
+	}
+	return r, nil
 }

@@ -64,24 +64,23 @@ func (rm *resourceManager) ResolveReferences(
 	apiReader client.Reader,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, bool, error) {
-	namespace := res.MetaObject().GetNamespace()
 	ko := rm.concreteResource(res).ko
 
 	resourceHasReferences := false
 	err := validateReferenceFields(ko)
-	if fieldHasReferences, err := rm.resolveReferenceForConnectionID(ctx, apiReader, namespace, ko); err != nil {
+	if fieldHasReferences, err := rm.resolveReferenceForConnectionID(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
 	}
 
-	if fieldHasReferences, err := rm.resolveReferenceForResourceID(ctx, apiReader, namespace, ko); err != nil {
+	if fieldHasReferences, err := rm.resolveReferenceForResourceID(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
 	}
 
-	if fieldHasReferences, err := rm.resolveReferenceForRestAPIID(ctx, apiReader, namespace, ko); err != nil {
+	if fieldHasReferences, err := rm.resolveReferenceForRestAPIID(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
@@ -121,7 +120,6 @@ func validateReferenceFields(ko *svcapitypes.Integration) error {
 func (rm *resourceManager) resolveReferenceForConnectionID(
 	ctx context.Context,
 	apiReader client.Reader,
-	namespace string,
 	ko *svcapitypes.Integration,
 ) (hasReferences bool, err error) {
 	if ko.Spec.ConnectionRef != nil && ko.Spec.ConnectionRef.From != nil {
@@ -129,6 +127,10 @@ func (rm *resourceManager) resolveReferenceForConnectionID(
 		arr := ko.Spec.ConnectionRef.From
 		if arr.Name == nil || *arr.Name == "" {
 			return hasReferences, fmt.Errorf("provided resource reference is nil or empty: ConnectionRef")
+		}
+		namespace := ko.ObjectMeta.GetNamespace()
+		if arr.Namespace != nil && *arr.Namespace != "" {
+			namespace = *arr.Namespace
 		}
 		obj := &svcapitypes.VPCLink{}
 		if err := getReferencedResourceState_VPCLink(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
@@ -198,7 +200,6 @@ func getReferencedResourceState_VPCLink(
 func (rm *resourceManager) resolveReferenceForResourceID(
 	ctx context.Context,
 	apiReader client.Reader,
-	namespace string,
 	ko *svcapitypes.Integration,
 ) (hasReferences bool, err error) {
 	if ko.Spec.ResourceRef != nil && ko.Spec.ResourceRef.From != nil {
@@ -206,6 +207,10 @@ func (rm *resourceManager) resolveReferenceForResourceID(
 		arr := ko.Spec.ResourceRef.From
 		if arr.Name == nil || *arr.Name == "" {
 			return hasReferences, fmt.Errorf("provided resource reference is nil or empty: ResourceRef")
+		}
+		namespace := ko.ObjectMeta.GetNamespace()
+		if arr.Namespace != nil && *arr.Namespace != "" {
+			namespace = *arr.Namespace
 		}
 		obj := &svcapitypes.Resource{}
 		if err := getReferencedResourceState_Resource(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
@@ -275,7 +280,6 @@ func getReferencedResourceState_Resource(
 func (rm *resourceManager) resolveReferenceForRestAPIID(
 	ctx context.Context,
 	apiReader client.Reader,
-	namespace string,
 	ko *svcapitypes.Integration,
 ) (hasReferences bool, err error) {
 	if ko.Spec.RestAPIRef != nil && ko.Spec.RestAPIRef.From != nil {
@@ -283,6 +287,10 @@ func (rm *resourceManager) resolveReferenceForRestAPIID(
 		arr := ko.Spec.RestAPIRef.From
 		if arr.Name == nil || *arr.Name == "" {
 			return hasReferences, fmt.Errorf("provided resource reference is nil or empty: RestAPIRef")
+		}
+		namespace := ko.ObjectMeta.GetNamespace()
+		if arr.Namespace != nil && *arr.Namespace != "" {
+			namespace = *arr.Namespace
 		}
 		obj := &svcapitypes.RestAPI{}
 		if err := getReferencedResourceState_RestAPI(ctx, apiReader, obj, *arr.Name, namespace); err != nil {

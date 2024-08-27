@@ -62,12 +62,11 @@ func (rm *resourceManager) ResolveReferences(
 	apiReader client.Reader,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, bool, error) {
-	namespace := res.MetaObject().GetNamespace()
 	ko := rm.concreteResource(res).ko
 
 	resourceHasReferences := false
 	err := validateReferenceFields(ko)
-	if fieldHasReferences, err := rm.resolveReferenceForEndpointConfiguration_VPCEndpointIDs(ctx, apiReader, namespace, ko); err != nil {
+	if fieldHasReferences, err := rm.resolveReferenceForEndpointConfiguration_VPCEndpointIDs(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
@@ -95,7 +94,6 @@ func validateReferenceFields(ko *svcapitypes.RestAPI) error {
 func (rm *resourceManager) resolveReferenceForEndpointConfiguration_VPCEndpointIDs(
 	ctx context.Context,
 	apiReader client.Reader,
-	namespace string,
 	ko *svcapitypes.RestAPI,
 ) (hasReferences bool, err error) {
 	if ko.Spec.EndpointConfiguration != nil {
@@ -105,6 +103,10 @@ func (rm *resourceManager) resolveReferenceForEndpointConfiguration_VPCEndpointI
 				arr := f0iter.From
 				if arr.Name == nil || *arr.Name == "" {
 					return hasReferences, fmt.Errorf("provided resource reference is nil or empty: EndpointConfiguration.VPCEndpointRefs")
+				}
+				namespace := ko.ObjectMeta.GetNamespace()
+				if arr.Namespace != nil && *arr.Namespace != "" {
+					namespace = *arr.Namespace
 				}
 				obj := &ec2apitypes.VPCEndpoint{}
 				if err := getReferencedResourceState_VPCEndpoint(ctx, apiReader, obj, *arr.Name, namespace); err != nil {

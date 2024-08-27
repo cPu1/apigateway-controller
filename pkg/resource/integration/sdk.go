@@ -61,6 +61,11 @@ func (rm *resourceManager) sdkFind(
 	defer func() {
 		exit(err)
 	}()
+	r, err = updateResource(r)
+	if err != nil {
+		return nil, err
+	}
+
 	// If any required fields in the input shape are missing, AWS resource is
 	// not created yet. Return NotFound here to indicate to callers that the
 	// resource isn't yet created.
@@ -413,6 +418,10 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	if err := setResourceIDAnnotation(ko); err != nil {
+		return nil, ackerr.NewTerminalError(err)
+	}
+
 	return &resource{ko}, nil
 }
 
@@ -854,6 +863,15 @@ func (rm *resourceManager) getImmutableFieldChanges(
 	delta *ackcompare.Delta,
 ) []string {
 	var fields []string
+	if delta.DifferentAt("Spec.HTTPMethod") {
+		fields = append(fields, "HTTPMethod")
+	}
+	if delta.DifferentAt("Spec.ResourceID") {
+		fields = append(fields, "ResourceID")
+	}
+	if delta.DifferentAt("Spec.RestAPIID") {
+		fields = append(fields, "RestAPIID")
+	}
 	if delta.DifferentAt("Spec.Type") {
 		fields = append(fields, "Type")
 	}
