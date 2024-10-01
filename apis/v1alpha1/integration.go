@@ -87,7 +87,7 @@ type IntegrationSpec struct {
 	TLSConfig       *TLSConfig `json:"tlsConfig,omitempty"`
 	// Specifies a put integration input's type.
 	// +kubebuilder:validation:Required
-	Type *string `json:"type_"`
+	Type *string `json:"type,omitempty"`
 	// Specifies Uniform Resource Identifier (URI) of the integration endpoint.
 	// For HTTP or HTTP_PROXY integrations, the URI must be a fully formed, encoded
 	// HTTP(S) URL according to the RFC-3986 specification, for either standard

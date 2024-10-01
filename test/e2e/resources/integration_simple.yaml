@@ -13,7 +13,7 @@ spec:
   integrationHTTPMethod: GET
   timeoutInMillis: 101
   integrationMethod: GET
-  type_: HTTP
+  type: HTTP
   uri: https://$INTEGRATION_NAME.com
   requestTemplates:
     application/json: '{"$schema": "http://json-schema.org/draft-04/schema#", "title": "Empty Schema", "type": "object"}'

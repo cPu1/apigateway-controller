@@ -187,7 +187,7 @@ spec:
                   insecureSkipVerification:
                     type: boolean
                 type: object
-              type_:
+              type:
                 description: Specifies a put integration input's type.
                 type: string
               uri:
@@ -214,7 +214,6 @@ spec:
                 type: string
             required:
             - httpMethod
-            - type_
             type: object
           status:
             description: IntegrationStatus defines the observed state of Integration

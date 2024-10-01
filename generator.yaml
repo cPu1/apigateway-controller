@@ -146,6 +146,7 @@ resources:
         is_immutable: true
       Type:
         is_immutable: true
+        go_tag: json:"type,omitempty"
       ConnectionID:
         references:
           resource: VPCLink
